@@ -14,6 +14,21 @@ import Nat64 "mo:base/Nat64";
 
 actor class Tokenmania() = this {
 
+  stable var user : {
+      identity: Text;
+      username: Text;
+      experiences: [{
+          name:Text
+      }];
+  } = {
+    identity = "";
+    username = "andrew";
+    experiences = [];
+  };
+
+  public func get_name(): async Text {
+    user.username;
+  };
   // Set temporary values for the token.
   // These will be overritten when the token is created.
   stable var init : {
@@ -38,8 +53,12 @@ actor class Tokenmania() = this {
     transfer_fee = 0;
   };
 
+  
+
   stable var logo : Text = "";
   stable var created : Bool = false;
+
+
 
   public query func token_created() : async Bool {
     created;

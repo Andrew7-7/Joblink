@@ -14,6 +14,7 @@ const App = () => {
   const [actor, setActor] = useState();
   const [tokenCreated, setTokenCreated] = useState(false);
   const [decimals, setDecimals] = useState(0n);
+  const [maklo, setMaklo] = useState('maklo');
 
   const updateSupply = async () => {
     try {
@@ -29,6 +30,9 @@ const App = () => {
   const checkTokenCreated = async () => {
     try {
       const result = await actor.token_created();
+      // console.log("hello: " + );
+      const res2 = await actor.get_name();
+      setMaklo(res2);
       setTokenCreated(result);
     } catch (error) {
       console.error('Error fetching token created status:', error);
@@ -57,6 +61,7 @@ const App = () => {
         tokenCreated={tokenCreated}
         setTokenCreated={setTokenCreated}
       />
+      <h1>{maklo}</h1>
       {tokenCreated ? (
         <div>
           <TokenInfo totalSupply={totalSupply} />
