@@ -44,23 +44,25 @@ actor class Tokenmania() = this {
     transfer_fee = 0;
   };
 
-  stable var logo : Text = "";
-  stable var created : Bool = false;
-
-  public func validate_user({
+  private func validate_user({
+    principal_id:Text;
     username: Text;
     email: Text;
     profile_pic: Blob;
-  }):async util.Response<Null>{
+  }): util.Response<Null>{
       if (username.size() < 1){
         return #Err("username cant be empty!");
       };
       if (Text.endsWith(email,#text "@gmail.com") == false){
         return #Err("email must ends with @gmail.com!");
       };
-      // if (profile_pic.size() < 1){
-      //   return #Err("you must have a profile picture");
-      // };
+      if (profile_pic.size() < 1){
+        return #Err("you must have a profile picture");
+      };
+      let comp = company_tree.get(principal_id);
+      if (comp != null){
+        return #Err("your internet identity already registered as company!");
+      };
       return #Ok(null);
   };
 
@@ -70,11 +72,10 @@ actor class Tokenmania() = this {
     email: Text;
     profile_pic: Blob;
   }): async util.Response<Null> {
-
-    let result = await validate_user({username; email; profile_pic}); 
+    let result = validate_user({principal_id; username; email; profile_pic}); 
     switch(result){
-      case(#Err(_)){
-        return result;
+      case(#Err(error)){
+        return #Err(error);
       };
       case (#Ok(_)){
         user_tree.put(principal_id, {
@@ -89,58 +90,15 @@ actor class Tokenmania() = this {
     }
   };
 
-  public shared func login({principal_id: Text;}) : async util.Response<?u.User> {
+  public shared func get_user({principal_id: Text;}) : async util.Response<?u.User> {
     let user = user_tree.get(principal_id);
     #Ok(user);
   };
 
-  public shared ({ caller }) func create_token({
-    token_name : Text;
-    token_symbol : Text;
-    initial_supply : Nat;
-    token_logo : Text;
-  }) : async Result<Text, Text> {
-    if (created) {
-      return #Err("Token already created");
-    };
-
-    if (Principal.isAnonymous(caller)) {
-      return #Err("Cannot create token with anonymous principal");
-    };
-
-    // Specify actual token details, set the caller to own some inital amount.
-    init := {
-      initial_mints = [{
-        account = {
-          owner = caller;
-          subaccount = null;
-        };
-        amount = initial_supply;
-      }];
-      minting_account = {
-        owner = caller;
-        subaccount = null;
-      };
-      token_name;
-      token_symbol;
-      decimals = 8; // Change this to the number of decimals you want to use.
-      transfer_fee = 10_000; // Change this to the fee you want to charge for transfers.
-    };
-
-    // Set the token logo.
-    logo := token_logo;
-
-    // Override the genesis chain with new minter and initial mints.
-    log := makeGenesisChain();
-
-    created := true;
-
-    #Ok("Token created");
+  public shared func get_company({principal_id: Text;}) : async util.Response<?c.Company> {
+    let company = company_tree.get(principal_id);
+    #Ok(company);
   };
-
-  // From here on, we use the reference implementation of the ICRC Ledger
-  // canister from https://github.com/dfinity/ICRC-1/blob/main/ref/ICRC1.mo,
-  // except where we add the token logo to the metadata.
 
   public type Account = { owner : Principal; subaccount : ?Subaccount };
   public type Subaccount = Blob;
@@ -413,18 +371,6 @@ actor class Tokenmania() = this {
 
   // The stable representation of the transaction log.
   // Used only during upgrades.
-  stable var persistedLog : [Transaction] = [];
-
-  system func preupgrade() {
-    persistedLog := log.toArray();
-  };
-
-  system func postupgrade() {
-    log := Buffer.Buffer(persistedLog.size());
-    for (tx in Array.vals(persistedLog)) {
-      log.add(tx);
-    };
-  };
 
   func recordTransaction(tx : Transaction) : TxIndex {
     let idx = log.size();
@@ -560,7 +506,6 @@ actor class Tokenmania() = this {
       ("icrc1:symbol", #Text(init.token_symbol)),
       ("icrc1:decimals", #Nat(Nat8.toNat(init.decimals))),
       ("icrc1:fee", #Nat(init.transfer_fee)),
-      ("icrc1:logo", #Text(logo)), /* Here we add the token logo to the metadata. */
     ];
   };
 

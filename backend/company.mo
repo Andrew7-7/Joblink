@@ -1,8 +1,6 @@
-import Text "mo:base/Text";
+import Biodata "Biodata";
 module {
-   public type Company = {
-        principal_id:Text;
-        name:Text;
-        email:Text;
+   public type Company = Biodata.Biodata and {
+      
    };
 };
