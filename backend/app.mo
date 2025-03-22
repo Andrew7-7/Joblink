@@ -14,6 +14,7 @@ import Nat64 "mo:base/Nat64";
 import Text "mo:base/Text";
 import u "./User";
 import c "./Company";
+import b "./Biodata";
 import util "./Util";
 import RBTree "mo:base/RBTree";
 
@@ -44,46 +45,54 @@ actor class Tokenmania() = this {
     transfer_fee = 0;
   };
 
-  private func validate_user({
-    principal_id:Text;
-    username: Text;
-    email: Text;
-    profile_pic: Blob;
-  }): util.Response<Null>{
-      if (username.size() < 1){
-        return #Err("username cant be empty!");
-      };
-      if (Text.endsWith(email,#text "@gmail.com") == false){
-        return #Err("email must ends with @gmail.com!");
-      };
-      if (profile_pic.size() < 1){
-        return #Err("you must have a profile picture");
-      };
-      let comp = company_tree.get(principal_id);
-      if (comp != null){
-        return #Err("your internet identity already registered as company!");
-      };
-      return #Ok(null);
-  };
-
   public shared func register_user({
     principal_id: Text;
     username: Text;
     email: Text;
     profile_pic: Blob;
   }): async util.Response<Null> {
-    let result = validate_user({principal_id; username; email; profile_pic}); 
+    let result = b.validate_biodata({username; email; profile_pic}); 
     switch(result){
       case(#Err(error)){
         return #Err(error);
       };
       case (#Ok(_)){
+        if (company_tree.get(principal_id) != null){
+          return #Err("this identity is already registered as company!");
+        };
         user_tree.put(principal_id, {
             name=username;
             email=email;
             profile_pic=profile_pic;
             principal_id=principal_id;
             experiences=[];
+        });
+        #Ok(null);
+      };
+    }
+  };
+
+  public shared func register_company({
+    principal_id: Text;
+    username: Text;
+    email: Text;
+    profile_pic: Blob;
+  }): async util.Response<Null> {
+    let result = b.validate_biodata({username; email; profile_pic}); 
+    switch(result){
+      case(#Err(error)){
+        return #Err(error);
+      };
+      case (#Ok(_)){
+        if (user_tree.get(principal_id) != null){
+          return #Err("this identity is already registered as user!");
+        };
+        company_tree.put(principal_id, {
+            name=username;
+            email=email;
+            profile_pic=profile_pic;
+            principal_id=principal_id;
+            aprovals=[];
         });
         #Ok(null);
       };

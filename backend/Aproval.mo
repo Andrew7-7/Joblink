@@ -1,8 +1,8 @@
 import User "User";
 module {
-    public type ExperienceApproval = {
+    public type ExperienceRequest = {
         principal_user_id:Text;
-        principal_company_id:Text;
+        status: Text;
         data: User.Experience;
     };
 }
