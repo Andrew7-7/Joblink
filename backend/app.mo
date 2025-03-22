@@ -58,9 +58,9 @@ actor class Tokenmania() = this {
       if (Text.endsWith(email,#text "@gmail.com") == false){
         return #Err("email must ends with @gmail.com!");
       };
-      if (profile_pic.size() < 1){
-        return #Err("you must have a profile picture");
-      };
+      // if (profile_pic.size() < 1){
+      //   return #Err("you must have a profile picture");
+      // };
       return #Ok(null);
   };
 

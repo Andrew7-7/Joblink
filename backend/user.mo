@@ -13,7 +13,7 @@ module {
             position:Text;
             description:Text;
             start_date:Time.Time;
-            end_time:Time.Time;
+            end_date:?Time.Time;
         }];
     };
 
