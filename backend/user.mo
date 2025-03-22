@@ -1,16 +1,20 @@
 import Text "mo:base/Text";
-import Int "mo:base/Int";
+import Time "mo:base/Time";
+import Blob "mo:base/Blob";
 
 module {   
     public type User = {
         principal_id: Text;
         name: Text;
         email: Text;
+        profile_pic: Blob;
         experiences:[{
             principal_id:Text;
             position:Text;
-            start_date:Int;
-            end_time:Int;
+            description:Text;
+            start_date:Time.Time;
+            end_time:Time.Time;
         }];
     };
+
 };

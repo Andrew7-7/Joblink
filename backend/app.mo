@@ -11,26 +11,17 @@ import Time "mo:base/Time";
 import Int "mo:base/Int";
 import Nat8 "mo:base/Nat8";
 import Nat64 "mo:base/Nat64";
+import Text "mo:base/Text";
+import u "./User";
+import c "./Company";
+import util "./Util";
+import RBTree "mo:base/RBTree";
 
 actor class Tokenmania() = this {
 
-  stable var user : {
-      identity: Text;
-      username: Text;
-      experiences: [{
-          name:Text
-      }];
-  } = {
-    identity = "";
-    username = "andrew";
-    experiences = [];
-  };
+  let user_tree = RBTree.RBTree<Text, u.User>(Text.compare);
+  let company_tree = RBTree.RBTree<Text, c.Company>(Text.compare);
 
-  public func get_name(): async Text {
-    user.username;
-  };
-  // Set temporary values for the token.
-  // These will be overritten when the token is created.
   stable var init : {
     initial_mints : [{
       account : { owner : Principal; subaccount : ?Blob };
@@ -53,45 +44,54 @@ actor class Tokenmania() = this {
     transfer_fee = 0;
   };
 
-  
-
   stable var logo : Text = "";
   stable var created : Bool = false;
 
-
-
-  public query func token_created() : async Bool {
-    created;
+  public func validate_user({
+    username: Text;
+    email: Text;
+    profile_pic: Blob;
+  }):async util.Response<Null>{
+      if (username.size() < 1){
+        return #Err("username cant be empty!");
+      };
+      if (Text.endsWith(email,#text "@gmail.com") == false){
+        return #Err("email must ends with @gmail.com!");
+      };
+      if (profile_pic.size() < 1){
+        return #Err("you must have a profile picture");
+      };
+      return #Ok(null);
   };
 
-  public shared ({ caller }) func delete_token() : async Result<Text, Text> {
-    if (not created) {
-      return #Err("Token not created");
-    };
+  public shared func register_user({
+    principal_id: Text;
+    username: Text;
+    email: Text;
+    profile_pic: Blob;
+  }): async util.Response<Null> {
 
-    if (not Principal.equal(caller, init.minting_account.owner)) {
-      return #Err("Caller is not the token creator");
-    };
-
-    created := false;
-
-    // Reset token details.
-    init := {
-      initial_mints = [];
-      minting_account = {
-        owner = Principal.fromBlob("\04");
-        subaccount = null;
+    let result = await validate_user({username; email; profile_pic}); 
+    switch(result){
+      case(#Err(_)){
+        return result;
       };
-      token_name = "";
-      token_symbol = "";
-      decimals = 0;
-      transfer_fee = 0;
-    };
+      case (#Ok(_)){
+        user_tree.put(principal_id, {
+            name=username;
+            email=email;
+            profile_pic=profile_pic;
+            principal_id=principal_id;
+            experiences=[];
+        });
+        #Ok(null);
+      };
+    }
+  };
 
-    // Override the genesis txns.
-    log := makeGenesisChain();
-
-    #Ok("Token deleted");
+  public shared func login({principal_id: Text;}) : async util.Response<?u.User> {
+    let user = user_tree.get(principal_id);
+    #Ok(user);
   };
 
   public shared ({ caller }) func create_token({
