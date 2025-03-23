@@ -8,6 +8,10 @@ module {
         email: Text;
         profile_pic: Blob;
     };
+    public type Role = {
+        #UserRole;
+        #CompanyRole;
+    };
     public func validate_biodata({
         username: Text;
         email: Text;
