@@ -8,6 +8,7 @@ import Time "mo:base/Time";
 import AssocList "mo:base/AssocList";
 import List "mo:base/List";
 import Array "mo:base/Array";
+import Buffer "mo:base/Buffer";
 import Aproval "Aproval";
 
 actor class Tokenmania() = this {
@@ -185,19 +186,19 @@ actor class Tokenmania() = this {
     principal_user_id:Text;
   }):async util.Response<[Aproval.ExperienceRequest]> {
 
-    var result: [Aproval.ExperienceRequest] = [];
+    var result:Buffer.Buffer<Aproval.ExperienceRequest> = Buffer.Buffer(5);
     for (entry in tree.entries()){
       switch(entry.1) {
         case(#Company(entry)) {
           var approval = AssocList.find<Text, Aproval.ExperienceRequest>(entry.aprovals,principal_user_id, Text.equal);
           switch(approval) {
             case(null) { };
-            case(?approval) { result := Array.append<Aproval.ExperienceRequest>(result, [approval]) };
+            case(?approval) { result.add(approval) };
           };
         };
         case(#User(entry)){ };
       };
     };
-    #Ok(result);
+    #Ok(Buffer.toArray(result));
   };
 };
