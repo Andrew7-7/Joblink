@@ -4,7 +4,9 @@ import c "./Company";
 import b "./Biodata";
 import util "./Util";
 import RBTree "mo:base/RBTree";
-import Company "Company";
+import Time "mo:base/Time";
+import Array "mo:base/Array";
+import Aproval "Aproval";
 
 actor class Tokenmania() = this {
 
@@ -94,5 +96,46 @@ actor class Tokenmania() = this {
       };
     };
     
+  };
+
+  public shared func create_experience({
+    principal_user_id: Text;
+    principal_company_id: Text;
+    position: Text;
+    start_date: Time.Time;
+    end_date: ?Time.Time;
+    description: Text;
+  }):async util.Response<Null>{
+    var comp = tree.get(principal_company_id);
+
+    switch(comp) {
+      case(null) { return #Err("Company not found!") };
+      case(?comp) {
+        switch(comp) {
+          case(#User(comp)) { return #Err("Not a company!") };
+          case(#Company(comp)) { 
+              var company = #Company{
+                  name=comp.name;
+                  email=comp.email;
+                  profile_pic=comp.profile_pic;
+                  principal_id=comp.principal_id;
+                  aprovals=Array.append<Aproval.ExperienceRequest>(comp.aprovals, [{
+                    principal_user_id=principal_user_id;
+                    status = #Pending;
+                    data= {
+                      position=position;
+                      description=description;
+                      start_date=start_date;
+                      end_date=end_date;
+                    };
+                  }]);
+              };
+              tree.put(principal_company_id, company);
+              #Ok(null);
+          };
+        };
+      };
+    };
+
   };
 };
