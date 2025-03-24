@@ -8,7 +8,6 @@ module {
     };
 
     public type ExperienceRequest = {
-        principal_user_id:Text;
         status: Status;
         data: User.Experience;
     };
