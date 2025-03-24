@@ -7,6 +7,7 @@ import RBTree "mo:base/RBTree";
 import Time "mo:base/Time";
 import AssocList "mo:base/AssocList";
 import List "mo:base/List";
+import Array "mo:base/Array";
 import Aproval "Aproval";
 
 actor class Tokenmania() = this {
@@ -180,10 +181,23 @@ actor class Tokenmania() = this {
 
     #Ok(null);
   };
-  public shared func get_experience_request({
+  public shared func get_user_experience_request({
     principal_user_id:Text;
-  // }):async util.Response<Aproval.ExperienceRequest> {
-  }):async util.Response<Null> {
-    #Ok(null);
+  }):async util.Response<[Aproval.ExperienceRequest]> {
+
+    var result: [Aproval.ExperienceRequest] = [];
+    for (entry in tree.entries()){
+      switch(entry.1) {
+        case(#Company(entry)) {
+          var approval = AssocList.find<Text, Aproval.ExperienceRequest>(entry.aprovals,principal_user_id, Text.equal);
+          switch(approval) {
+            case(null) { };
+            case(?approval) { result := Array.append<Aproval.ExperienceRequest>(result, [approval]) };
+          };
+        };
+        case(#User(entry)){ };
+      };
+    };
+    #Ok(result);
   };
 };
