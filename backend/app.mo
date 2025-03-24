@@ -115,7 +115,7 @@ actor class Tokenmania() = this {
         switch(comp) {
           case(#User(comp)) { return #Err("Not a company!") };
           case(#Company(comp)) { 
-                var maklo:?Aproval.ExperienceRequest = ?{
+                var new_request:?Aproval.ExperienceRequest = ?{
                       status=#Pending;
                       data={
                         position=position;
@@ -124,8 +124,8 @@ actor class Tokenmania() = this {
                         end_date=end_date;
                       };
                 };
-                var new_aprovals : AssocList.AssocList<Text, ?Aproval.ExperienceRequest> = List.nil();
-                new_aprovals := AssocList.replace<Text, ?Aproval.ExperienceRequest>(new_aprovals, principal_user_id, Text.equal, ?maklo).0;
+                var new_aprovals : AssocList.AssocList<Text, Aproval.ExperienceRequest> = List.nil();
+                new_aprovals := AssocList.replace<Text, Aproval.ExperienceRequest>(new_aprovals, principal_user_id, Text.equal, new_request).0;
                 var company = #Company{
                     name=comp.name;
                     email=comp.email;
@@ -152,14 +152,34 @@ actor class Tokenmania() = this {
       case(?comp) {
         switch(comp) {
           case(#User(comp)) { return #Err("Not a company!") };
-          case(#Company(company)){}
+          case(#Company(comp)){
+            var res = AssocList.find<Text, Aproval.ExperienceRequest>(comp.aprovals,principal_user_id, Text.equal);
+            switch(res) {
+              case(null) { return #Err("Request not found!") };
+              case(?res) { 
+                var updated:?Aproval.ExperienceRequest = ?{
+                  data = res.data;
+                  status = status;
+                };
+                var new_aprovals : AssocList.AssocList<Text, Aproval.ExperienceRequest> = List.nil();
+                new_aprovals := AssocList.replace<Text, Aproval.ExperienceRequest>(new_aprovals, principal_user_id, Text.equal, updated).0;
+                var company = #Company{
+                    name=comp.name;
+                    email=comp.email;
+                    profile_pic=comp.profile_pic;
+                    principal_id=comp.principal_id;
+                    aprovals=new_aprovals;
+                };
+                tree.put(principal_company_id, company); 
+              };
+            };
+          }
         };
       };
     };
 
     #Ok(null);
   };
-
   public shared func get_experience_request({
     principal_user_id:Text;
   // }):async util.Response<Aproval.ExperienceRequest> {
