@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-const ContextProvider = createContext(null);
+const ActorContext = createContext(null);
 
 
-export default ContextProvider;
+export default ActorContext;
