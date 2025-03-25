@@ -1,47 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { AuthClient } from '@dfinity/auth-client';
-import { createActor, canisterId } from 'declarations/backend';
+import React, { useContext, useEffect, useState } from 'react';
+import AuthContext from './AuthContext';
 
-const network = process.env.DFX_NETWORK;
-const identityProvider =
-  network === 'ic'
-    ? 'https://identity.ic0.app' // Mainnet
-    : 'http://rdmx6-jaaaa-aaaaa-aaadq-cai.localhost:4943'; // Local
-
-const InternetIdentity = ({ setActor, isAuthenticated, setIsAuthenticated }) => {
-  const [authClient, setAuthClient] = useState();
-  const [principal, setPrincipal] = useState();
-  useEffect(() => {
-    updateActor();
-  }, []);
-
-  async function updateActor() {
-    const authClient = await AuthClient.create();
-    const identity = authClient.getIdentity();
-    const actor = createActor(canisterId, {
-      agentOptions: {
-        identity
-      }
-    });
-    const isAuthenticated = await authClient.isAuthenticated();
-
-    setActor(actor);
-    setAuthClient(authClient);
-    setIsAuthenticated(isAuthenticated);
-    setPrincipal(identity.getPrincipal().toString());
-  }
-
-  async function login() {
-    await authClient.login({
-      identityProvider,
-      onSuccess: updateActor
-    });
-  }
-
-  async function logout() {
-    await authClient.logout();
-    updateActor();
-  }
+const InternetIdentity = () => {
+  
+  const {principal,b,login,logout, updateActor, isAuthenticated} = useContext(AuthContext);
+  
+  // useEffect(() => {
+  //   updateActor();
+  // }, []);
 
   return (
     <div className="flex items-center space-x-4">
@@ -60,7 +26,7 @@ const InternetIdentity = ({ setActor, isAuthenticated, setIsAuthenticated }) => 
       ) : (
         <button
           onClick={login}
-          className="transform rounded-lg bg-infinite hover:bg-white px-6 py-2 text-sm font-bold text-white hover:text-infinite shadow-md transition duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+          className="transform rounded-lg bg-infinite hover:bg-white px-6 py-2 text-sm font-bold text-white hover:text-infinite shadow-md transition duration-300 ease-in-out  hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
         >
           Sign In
         </button>
