@@ -3,7 +3,6 @@ import ActorContext from "./ActorContext";
 
 const ActorProvider = ({children}) => {
     const [actor, setActor] = useState();
-    const [principal, setPrincipal] = useState();
 
     return (
         <ActorContext.Provider value={{actor, setActor}}>

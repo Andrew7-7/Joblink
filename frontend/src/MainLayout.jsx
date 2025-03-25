@@ -2,20 +2,18 @@ import { useContext, useState } from "react";
 import ActorProvider from "./ActorProvider";
 import Header from "./Header";
 import AuthProvider from "./AuthProvider";
+import AuthContext from "./AuthContext";
 
 const MainLayout = ({children}) => {
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+    const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext)
     return (
-        <ActorProvider>
-            <AuthProvider>
-                <Header
-                    isAuthenticated={isAuthenticated}
-                    setIsAuthenticated={setIsAuthenticated}/>
+        <>
+            <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated}/>
+            <div className="min-h-screen w-full bg-gradient-to-b from-[var(--background)] to-[var(--secondary)] overflow-hidden">
                 {children}
-            </AuthProvider>
-        </ActorProvider>
+            </div>
+        </>
     );
 }
 

@@ -11,13 +11,13 @@ const identityProvider =
     : 'http://rdmx6-jaaaa-aaaaa-aaadq-cai.localhost:4943'; // Local
 
 const AuthProvider = ({children}) => {
-    const [principal, setPrincipal] = useState("");
+    const {user, setUser} = useState();
     const {actor, setActor} = useContext(ActorContext);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     
     const [authClient, setAuthClient] = useState();
     async function updateActor() {
-        const authClient = await AuthClient.create();
+      const authClient = await AuthClient.create();
       const identity = authClient.getIdentity();
       const actor = createActor(canisterId, {
         agentOptions: {
@@ -28,11 +28,10 @@ const AuthProvider = ({children}) => {
       setActor(actor);
       setAuthClient(authClient);
       setIsAuthenticated(authClient.isAuthenticated());
-      setPrincipal(identity.getPrincipal().toString());
     }
   
     async function login() {
-        await authClient.login({
+      await authClient.login({
         identityProvider,
         onSuccess: updateActor
       });
@@ -44,7 +43,7 @@ const AuthProvider = ({children}) => {
     }
 
     return (
-        <AuthContext.Provider value={{principal, setPrincipal, login, logout, updateActor, isAuthenticated}}>
+        <AuthContext.Provider value={{user, setUser, login, logout, updateActor, isAuthenticated, setIsAuthenticated}}>
         {children}
         </AuthContext.Provider>
     )

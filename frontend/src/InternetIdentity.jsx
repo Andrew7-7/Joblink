@@ -4,10 +4,12 @@ import AuthContext from './AuthContext';
 const InternetIdentity = () => {
   
   const {principal,b,login,logout, updateActor, isAuthenticated} = useContext(AuthContext);
-  
-  // useEffect(() => {
-  //   updateActor();
-  // }, []);
+
+  useEffect(() => {
+    updateActor(); 
+    // console.log('cibai')
+    // console.log(context)
+  }, []);
 
   return (
     <div className="flex items-center space-x-4">
