@@ -2,6 +2,6 @@ node_modules
 .dfx
 .mops
 *.env
-src
 frontend/dist/
 .devcontainer
+declarations

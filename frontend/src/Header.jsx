@@ -1,50 +1,33 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import InternetIdentity from './InternetIdentity';
 import { canisterId } from 'declarations/backend';
+import ActorContext from './ActorContext';
 
-const Header = ({ actor, setActor, isAuthenticated, setIsAuthenticated, tokenCreated, setTokenCreated }) => {
-  const handleDeleteToken = async () => {
-    try {
-      const result = await actor.delete_token();
-      if ('Ok' in result) {
-        setTokenCreated(false);
-      } else if ('Err' in result) {
-        console.error('Failed to delete token:', result.Err);
-        alert('Failed to delete token: ' + result.Err);
-      }
-    } catch (error) {
-      console.error('Error deleting token:', error);
-    }
-  };
+const Header = ({ isAuthenticated, setIsAuthenticated }) => {
 
+  const {actor, setActor} = useContext(ActorContext)
+  const [index, setIndex] = useState(0)
+
+  const pages = [
+    "Home","Experience", "Company"
+  ]
+  
   return (
-    <header className="bg-infinite mb-2 p-4 text-white">
-      <div className="mx-auto flex flex-row flex-wrap items-center justify-between gap-2">
-        <h1 className="text-4xl font-bold">Tokenmania</h1>
-        <div className="flexitems-center">
+    <header className="mb-2 p-8 w-full text-white fixed top w-screen flex flex-row flex-wrap items-center justify-between z-50">
+      <div className="w-1/5 justify-start flex">
+          <h1 className="text-3xl font-bold px-5 py-2 text-white">JobLink</h1>
+        </div>
+        <div className="w-2/5 bg-[var(--secondary)] rounded-3xl px-10 flex justify-between drop-shadow-lg">
+          {pages.map((e, idx) => 
+          <p onClick={() => {setIndex(idx)}} className={`text-lg font-semibold py-2 ${idx == index?"border-b-4 border-white":""}`} key={idx}>{e}</p>)}
+        </div>
+        <div className="w-1/5 flex justify-end">
           <InternetIdentity
             setActor={setActor}
             isAuthenticated={isAuthenticated}
             setIsAuthenticated={setIsAuthenticated}
           />
-          {isAuthenticated && tokenCreated && (
-            <div>
-              <button
-                onClick={() => window.open(`https://nns.ic0.app/tokens/?import-ledger-id=${canisterId}`, '_blank')}
-                className="ml-4 transform rounded-lg bg-blue-500 px-3 py-1 text-sm font-bold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-              >
-                Import Token into NNS
-              </button>
-              <button
-                onClick={handleDeleteToken}
-                className="ml-4 transform rounded-lg bg-red-500 px-3 py-1 text-sm font-bold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-              >
-                Delete Token
-              </button>
-            </div>
-          )}
         </div>
-      </div>
     </header>
   );
 };

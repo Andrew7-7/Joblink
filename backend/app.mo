@@ -4,7 +4,11 @@ import c "./Company";
 import b "./Biodata";
 import util "./Util";
 import RBTree "mo:base/RBTree";
-import Company "Company";
+import Time "mo:base/Time";
+import AssocList "mo:base/AssocList";
+import List "mo:base/List";
+import Buffer "mo:base/Buffer";
+import Aproval "Aproval";
 
 actor class Tokenmania() = this {
 
@@ -46,7 +50,7 @@ actor class Tokenmania() = this {
                 email=email;
                 profile_pic=profile_pic;
                 principal_id=principal_id;
-                aprovals=[];
+                aprovals=null;
               });
           };
         };
@@ -94,5 +98,106 @@ actor class Tokenmania() = this {
       };
     };
     
+  };
+
+  public shared func create_experience({
+    principal_user_id: Text;
+    principal_company_id: Text;
+    position: Text;
+    start_date: Time.Time;
+    end_date: ?Time.Time;
+    description: Text;
+  }):async util.Response<Null>{
+    var comp = tree.get(principal_company_id);
+
+    switch(comp) {
+      case(null) { return #Err("Company not found!") };
+      case(?comp) {
+        switch(comp) {
+          case(#User(comp)) { return #Err("Not a company!") };
+          case(#Company(comp)) { 
+                var new_request:?Aproval.ExperienceRequest = ?{
+                      status=#Pending;
+                      data={
+                        position=position;
+                        description=description;
+                        start_date=start_date;
+                        end_date=end_date;
+                      };
+                };
+                var new_aprovals : AssocList.AssocList<Text, Aproval.ExperienceRequest> = List.nil();
+                new_aprovals := AssocList.replace<Text, Aproval.ExperienceRequest>(new_aprovals, principal_user_id, Text.equal, new_request).0;
+                var company = #Company{
+                    name=comp.name;
+                    email=comp.email;
+                    profile_pic=comp.profile_pic;
+                    principal_id=comp.principal_id;
+                    aprovals=new_aprovals;
+                };
+
+                tree.put(principal_company_id, company); 
+          };
+        };
+      };
+    };
+    #Ok(null);
+  };
+  public shared func update_experience_request({
+    principal_company_id:Text;
+    principal_user_id:Text;
+    status: Aproval.Status;
+  }):async util.Response<Null>{
+    var comp = tree.get(principal_company_id);
+    switch(comp){
+      case(null) { return #Err("Company not found!") };
+      case(?comp) {
+        switch(comp) {
+          case(#User(comp)) { return #Err("Not a company!") };
+          case(#Company(comp)){
+            var res = AssocList.find<Text, Aproval.ExperienceRequest>(comp.aprovals,principal_user_id, Text.equal);
+            switch(res) {
+              case(null) { return #Err("Request not found!") };
+              case(?res) { 
+                var updated:?Aproval.ExperienceRequest = ?{
+                  data = res.data;
+                  status = status;
+                };
+                var new_aprovals : AssocList.AssocList<Text, Aproval.ExperienceRequest> = List.nil();
+                new_aprovals := AssocList.replace<Text, Aproval.ExperienceRequest>(new_aprovals, principal_user_id, Text.equal, updated).0;
+                var company = #Company{
+                    name=comp.name;
+                    email=comp.email;
+                    profile_pic=comp.profile_pic;
+                    principal_id=comp.principal_id;
+                    aprovals=new_aprovals;
+                };
+                tree.put(principal_company_id, company); 
+              };
+            };
+          }
+        };
+      };
+    };
+
+    #Ok(null);
+  };
+  public shared func get_user_experience_request({
+    principal_user_id:Text;
+  }):async util.Response<[Aproval.ExperienceRequest]> {
+
+    var result:Buffer.Buffer<Aproval.ExperienceRequest> = Buffer.Buffer(5);
+    for (entry in tree.entries()){
+      switch(entry.1) {
+        case(#Company(entry)) {
+          var approval = AssocList.find<Text, Aproval.ExperienceRequest>(entry.aprovals,principal_user_id, Text.equal);
+          switch(approval) {
+            case(null) { };
+            case(?approval) { result.add(approval) };
+          };
+        };
+        case(#User(entry)){ };
+      };
+    };
+    #Ok(Buffer.toArray(result));
   };
 };
