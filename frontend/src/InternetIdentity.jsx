@@ -1,14 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
-import AuthContext from './AuthContext';
+import {AuthContext} from './AuthContext';
 
 const InternetIdentity = () => {
   
-  const {principal,b,login,logout, updateActor, isAuthenticated} = useContext(AuthContext);
+  const {principal,login,logout, updateActor, isAuthenticated} = useContext(AuthContext);
 
   useEffect(() => {
     updateActor(); 
-    // console.log('cibai')
-    // console.log(context)
+    // logout();
   }, []);
 
   return (

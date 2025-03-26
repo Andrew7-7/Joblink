@@ -1,6 +1,7 @@
 import { useContext } from "react"
-import AuthContext from "./AuthContext"
+import {AuthContext} from "./AuthContext"
 import Button from "./Button"
+import React from 'react';
 
 const Landing = () => {
 

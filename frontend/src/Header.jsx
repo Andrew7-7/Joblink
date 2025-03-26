@@ -1,11 +1,10 @@
 import React, { useContext, useState } from 'react';
 import InternetIdentity from './InternetIdentity';
-import { canisterId } from 'declarations/backend';
-import ActorContext from './ActorContext';
+import {AuthContext} from "./AuthContext";
 
 const Header = ({ isAuthenticated, setIsAuthenticated }) => {
 
-  const {actor, setActor} = useContext(ActorContext)
+  const {setActor} = useContext(AuthContext)
   const [index, setIndex] = useState(0)
 
   const pages = [

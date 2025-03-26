@@ -9,14 +9,36 @@ import AssocList "mo:base/AssocList";
 import List "mo:base/List";
 import Buffer "mo:base/Buffer";
 import Aproval "Aproval";
+import Random = "mo:base/Random";
+import Iter "mo:base/Iter";
+import Nat "mo:base/Nat";
+import Array "mo:base/Array";
 
-actor class Tokenmania() = this {
+actor class ExpLink() = this {
 
   type Entity = {
     #User:u.User;
     #Company:c.Company;
   };
   let tree = RBTree.RBTree<Text, Entity>(Text.compare);
+
+  public func generateCode():async Text{
+      let random = Random.Finite(await Random.blob());
+      var numbers : [var Nat] = Array.init<Nat>(6, 0);
+
+      for (i in Iter.range(0, 5)){
+        var num = random.range(32);
+        switch(num){
+          case (null){};
+          case (?num){numbers[i] := num % 10};
+        };
+      };
+      var a:Text = "";
+      for (i in Iter.range(0,5)){
+          a := a # Nat.toText(numbers[i]);
+      };
+      a
+  };
 
   public shared func register({
     principal_id: Text;
