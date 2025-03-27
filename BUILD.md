@@ -40,9 +40,9 @@ Lastly, navigate into your project's directory that you downloaded from ICP Ninj
 
 Continue building your projects locally by installing the [Dev Container extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) for VS Code and [Docker](https://docs.docker.com/engine/install/).
 
-Make sure Docker is running, then navigate into your project's directory that you downloaded from ICP Ninja and start the Dev Container by selecting `Dev-Containers: Reopen in Container` in VS Code's command palette (F1 or Ctrl+Shift+P).
+Make sure Docker is running, then navigate into your project's directory that you downloaded from ICP Ninja and start the Dev Container by selecting `Dev-Containers: Reopen in Container` in VS Code's command palette (F1 or Ctrl/Cmd+Shift+P).
 
-> Note that local development ports (e.g. the ports used by `dfx` or `vite`) are forwarded from the Dev Container to your local machine. In the VS code terminal, use Cmd+Click on the displayed local URLs to open them in your browser. To view the current port mappings, click the "Ports" tab in the VS Code terminal window.
+> Note that local development ports (e.g. the ports used by `dfx` or `vite`) are forwarded from the Dev Container to your local machine. In the VS code terminal, use Ctrl/Cmd+Click on the displayed local URLs to open them in your browser. To view the current port mappings, click the "Ports" tab in the VS Code terminal window.
 
 ### 2. Create a local developer identity.
 
@@ -70,10 +70,10 @@ Your identity will have a principal ID associated with it. Principal IDs are use
 
 ### 3. Deploy the project locally.
 
-Deploy your project to your local developer environment with the command:
+Deploy your project to your local developer environment with:
 
 ```
-
+npm install
 dfx deploy
 
 ```

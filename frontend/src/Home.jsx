@@ -10,7 +10,7 @@ const Home = () => {
 
     return (
         <>
-            {!user?<Register />:<Dashboard />}
+            {(user == "")?<Register />:<Dashboard />}
         </>
     )
 }

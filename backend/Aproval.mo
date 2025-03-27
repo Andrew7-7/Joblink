@@ -1,4 +1,4 @@
-import User "User";
+import User "Experience";
 module {
     public type Status = {
         #Rejected;
