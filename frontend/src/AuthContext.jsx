@@ -1,8 +1,8 @@
 import { createContext } from "react";
 import React,{ useContext, useState } from "react";
 import { AuthClient } from '@dfinity/auth-client';
-import { createActor, canisterId } from 'declarations/backend';
-import { backend } from 'declarations/backend';
+// import { createActor, canisterId } from 'declarations/backend';
+// import { backend } from 'declarations/backend';
 
 const AuthContext = createContext(null);
 const network = process.env.DFX_NETWORK;
