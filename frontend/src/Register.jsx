@@ -1,7 +1,7 @@
 import React,{ useState,useContext, useEffect } from "react"
 import Button from "./Button"
 import {AuthContext} from "./AuthContext"
-import { backend } from 'declarations/backend';
+// import { backend } from 'declarations/backend';
 import Popup from "./Popup";
 
 const Register = () => {
