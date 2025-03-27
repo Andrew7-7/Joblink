@@ -1,0 +1,114 @@
+type User = 
+ record {
+   email: text;
+   experiences: vec Experience;
+   name: text;
+   principal_id: text;
+   profile_pic: blob;
+ };
+type Tokenmania = 
+ service {
+   create_experience:
+    (record {
+       description: text;
+       end_date: opt Time;
+       position: text;
+       principal_company_id: text;
+       principal_user_id: text;
+       start_date: Time;
+     }) -> (Response);
+   get: (record {principal_id: text;}) -> (Response_2);
+   get_user_experience_request: (record {principal_user_id: text;}) ->
+    (Response_1);
+   register:
+    (record {
+       email: text;
+       principal_id: text;
+       profile_pic: blob;
+       role: Role;
+       username: text;
+     }) -> (Response);
+   update_experience_request:
+    (record {
+       principal_company_id: text;
+       principal_user_id: text;
+       status: Status;
+     }) -> (Response);
+   update_profile:
+    (record {
+       email: text;
+       principal_id: text;
+       profile_pic: blob;
+       username: text;
+     }) -> (Response);
+ };
+type Time = int;
+type Status = 
+ variant {
+   Accepted;
+   Canceled;
+   Pending;
+   Rejected;
+ };
+type Role = 
+ variant {
+   CompanyRole;
+   UserRole;
+ };
+type Response_2 = 
+ variant {
+   Err: text;
+   Ok: opt Entity;
+ };
+type Response_1 = 
+ variant {
+   Err: text;
+   Ok: vec ExperienceRequest;
+ };
+type Response = 
+ variant {
+   Err: text;
+   Ok;
+ };
+type List = 
+ opt record {
+       record {
+         text;
+         ExperienceRequest;
+       };
+       List;
+     };
+type ExperienceRequest = 
+ record {
+   data: Experience;
+   status: Status;
+ };
+type Experience = 
+ record {
+   description: text;
+   end_date: opt Time;
+   position: text;
+   start_date: Time;
+ };
+type Entity = 
+ variant {
+   Company: Company;
+   User: User;
+ };
+type Company = 
+ record {
+   aprovals: AssocList;
+   email: text;
+   name: text;
+   principal_id: text;
+   profile_pic: blob;
+ };
+type AssocList = 
+ opt record {
+       record {
+         text;
+         ExperienceRequest;
+       };
+       List;
+     };
+service : () -> Tokenmania
