@@ -1,11 +1,8 @@
 import Text "mo:base/Text";
-import u "./Experience";
 import b "./Biodata";
-import util "./Util";
 import RBTree "mo:base/RBTree";
 import Time "mo:base/Time";
 import Buffer "mo:base/Buffer";
-import Aproval "Aproval";
 import Random = "mo:base/Random";
 import Iter "mo:base/Iter";
 import Array "mo:base/Array";
@@ -14,10 +11,32 @@ import Int "mo:base/Int";
 import Bool "mo:base/Bool";
 
 actor class ExpLink() = this {
+
+  
+
+  public type Experience = {
+        principal_user_id:Text;
+        position: Text;
+        start_date: Time.Time;
+        end_date: ?Time.Time;
+        description: Text;
+  };
+
+  public type Status = {
+        #Rejected;
+        #Canceled;
+        #Pending;
+        #Accepted;
+    };
+
+    public type ExperienceRequest = {
+        status: Status;
+        data: Experience;
+    };
   
   let tree = RBTree.RBTree<Text, b.Biodata>(Text.compare);
-  let expTree = RBTree.RBTree<Text, [u.Experience]>(Text.compare);
-  let approvalTree = RBTree.RBTree<Text, [Aproval.ExperienceRequest]>(Text.compare);
+  let expTree = RBTree.RBTree<Text, [Experience]>(Text.compare);
+  let approvalTree = RBTree.RBTree<Text, [ExperienceRequest]>(Text.compare);
 
   public func generateCode():async Text{
       let random = Random.Finite(await Random.blob());
@@ -43,7 +62,7 @@ actor class ExpLink() = this {
     email: Text;
     profile_pic: Text;
     role: b.Role;
-  }): async util.Response<Null> {
+  }): async b.Response<Null> {
     let result = b.validate_biodata({username; email; profile_pic}); 
     switch(result){
       case(#Err(error)){
@@ -81,7 +100,7 @@ actor class ExpLink() = this {
     email: Text;
     profile_pic: Text;
     
-  }):async util.Response<Null> {
+  }):async b.Response<Null> {
     let result = b.validate_biodata({username; email; profile_pic}); 
     switch(result) {
       case(#Err(error)){
@@ -110,7 +129,7 @@ actor class ExpLink() = this {
     start_date: Time.Time;
     end_date: ?Time.Time;
     description: Text;
-  }):async util.Response<Null>{
+  }):async b.Response<Null>{
     var comp = tree.get(principal_company_id);
 
     switch(comp) {
@@ -119,7 +138,7 @@ actor class ExpLink() = this {
         switch(comp.role) {
           case("User") { return #Err("Not a company!") };
           case("Company") { 
-                var new_request:Aproval.ExperienceRequest = {
+                var new_request:ExperienceRequest = {
                       status=#Pending;
                       data={
                         principal_user_id=principal_user_id;
@@ -132,12 +151,12 @@ actor class ExpLink() = this {
                 var approvals = approvalTree.get(principal_company_id);
                 switch(approvals){
                   case(null){
-                    var list = Buffer.Buffer<Aproval.ExperienceRequest>(4);
+                    var list = Buffer.Buffer<ExperienceRequest>(4);
                     list.add(new_request);
                     approvalTree.put(principal_company_id, Buffer.toArray(list));
                   };
                   case(?approvals){
-                    var list = Buffer.fromArray<Aproval.ExperienceRequest>(approvals);
+                    var list = Buffer.fromArray<ExperienceRequest>(approvals);
                     list.add(new_request);
                     approvalTree.put(principal_company_id, Buffer.toArray(list));
                   }
@@ -152,8 +171,8 @@ actor class ExpLink() = this {
   public shared func update_experience_request({
     principal_company_id:Text;
     index:Nat;
-    status: Aproval.Status;
-  }):async util.Response<Null>{
+    status: Status;
+  }):async b.Response<Null>{
     var comp = tree.get(principal_company_id);
     switch(comp){
       case(null) { return #Err("Company not found!") };
@@ -168,11 +187,11 @@ actor class ExpLink() = this {
                 if (index >= res.size()){
                   return #Err("Index invalid!")
                 };
-                var updated:Aproval.ExperienceRequest = {
+                var updated:ExperienceRequest = {
                   data = res.get(index).data;
                   status = status;
                 };
-                var list = Buffer.fromArray<Aproval.ExperienceRequest>(res);
+                var list = Buffer.fromArray<ExperienceRequest>(res);
                 list.put(index, updated);
                 approvalTree.put(principal_company_id, Buffer.toArray(list));
                 switch(status) {
@@ -180,12 +199,12 @@ actor class ExpLink() = this {
                     var exp = expTree.get(res.get(index).data.principal_user_id);
                     switch(exp) {
                       case(?exp) { 
-                            var list = Buffer.fromArray<u.Experience>(exp);
+                            var list = Buffer.fromArray<Experience>(exp);
                             list.add(res.get(index).data);
                             expTree.put(res.get(index).data.principal_user_id, Buffer.toArray(list));
                        };
                       case(null) { 
-                            var list = Buffer.Buffer<u.Experience>(5);
+                            var list = Buffer.Buffer<Experience>(5);
                             list.add(res.get(index).data);
                             expTree.put(res.get(index).data.principal_user_id, Buffer.toArray(list));
                       };
@@ -205,7 +224,7 @@ actor class ExpLink() = this {
   };
   public shared func get_company_experience_request({
     principal_company_id:Text;
-  }):async [Aproval.ExperienceRequest] {
+  }):async [ExperienceRequest] {
     var res = approvalTree.get(principal_company_id);
     switch(res){
       case (null) { [] };
@@ -215,18 +234,18 @@ actor class ExpLink() = this {
   public shared func get_company_user({
     principal_company_id:Text;
     is_active:Bool
-  }):async [Aproval.ExperienceRequest] {
+  }):async [ExperienceRequest] {
     var res = approvalTree.get(principal_company_id);
     switch(res){
       case (null) { [] };
       case (?res) {
-          Array.filter<Aproval.ExperienceRequest>(res, func x = (x.data.end_date == null) == is_active and x.status == #Accepted);
+          Array.filter<ExperienceRequest>(res, func x = (x.data.end_date == null) == is_active and x.status == #Accepted);
       };
     }
   };
 
-  public shared func feed(): async [u.Experience] {
-    var result:Buffer.Buffer<u.Experience> = Buffer.Buffer(5);
+  public shared func feed(): async [Experience] {
+    var result:Buffer.Buffer<Experience> = Buffer.Buffer(5);
     for (entry in expTree.entries()){
       for (i in Iter.range(0, entry.1.size()-1)){
         result.add(entry.1.get(i));
@@ -236,7 +255,7 @@ actor class ExpLink() = this {
     Buffer.toArray(result);
   };
 
-  public shared func get_user_experiences({principal_user_id:Text}): async [u.Experience] {
+  public shared func get_user_experiences({principal_user_id:Text}): async [Experience] {
     var result = expTree.get(principal_user_id);
     switch(result) {
       case(?result) { result };

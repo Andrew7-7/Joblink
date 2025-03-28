@@ -1,6 +1,9 @@
 import Text "mo:base/Text";
-import util "./Util";
 module {
+    public type Response<T> = {
+        #Ok : T;
+        #Err : Text;
+    };
     public type Biodata = {
         principal_id: Text;
         name: Text;
@@ -16,7 +19,7 @@ module {
         username: Text;
         email: Text;
         profile_pic: Text;
-    }): util.Response<Null>{
+    }): Response<Null>{
         if (username.size() < 1){
             return #Err("username cant be empty!");
         };
