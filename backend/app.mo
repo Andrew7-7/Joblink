@@ -8,11 +8,11 @@ import Buffer "mo:base/Buffer";
 import Aproval "Aproval";
 import Random = "mo:base/Random";
 import Iter "mo:base/Iter";
-import Nat "mo:base/Nat";
 import Array "mo:base/Array";
+import Nat "mo:base/Nat";
+import Int "mo:base/Int";
 
 actor class ExpLink() = this {
-
   
   let tree = RBTree.RBTree<Text, b.Biodata>(Text.compare);
   let expTree = RBTree.RBTree<Text, Buffer.Buffer<u.Experience>>(Text.compare);
@@ -149,7 +149,7 @@ actor class ExpLink() = this {
   };
   public shared func update_experience_request({
     principal_company_id:Text;
-    principal_user_id:Text;
+    index:Nat;
     status: Aproval.Status;
   }):async util.Response<Null>{
     var comp = tree.get(principal_company_id);
@@ -163,20 +163,32 @@ actor class ExpLink() = this {
             switch(res) {
               case(null) { return #Err("Request not found!") };
               case(?res) { 
-                // var updated:?Aproval.ExperienceRequest = ?{
-                //   data = res.data;
-                //   status = status;
-                // };
-                // var new_aprovals : AssocList.AssocList<Text, Aproval.ExperienceRequest> = List.nil();
-                // new_aprovals := AssocList.replace<Text, Aproval.ExperienceRequest>(new_aprovals, principal_user_id, Text.equal, updated).0;
-                // var company = #Company{
-                //     name=comp.name;
-                //     email=comp.email;
-                //     profile_pic=comp.profile_pic;
-                //     principal_id=comp.principal_id;
-                //     aprovals=new_aprovals;
-                // };
-                // tree.put(principal_company_id, company); 
+                if (index >= res.size()){
+                  return #Err("Index invalid!")
+                };
+                var updated:Aproval.ExperienceRequest = {
+                  data = res.get(index).data;
+                  status = status;
+                };
+                res.put(index, updated);
+                approvalTree.put(principal_company_id, res);
+                switch(status) {
+                  case(#Accepted) { 
+                    var exp = expTree.get(res.get(index).data.principal_user_id);
+                    switch(exp) {
+                      case(?exp) { 
+                            exp.add(res.get(index).data);
+                            expTree.put(res.get(index).data.principal_user_id, exp);
+                       };
+                      case(null) { 
+                            var list = Buffer.Buffer<u.Experience>(5);
+                            list.add(res.get(index).data);
+                            expTree.put(res.get(index).data.principal_user_id, list);
+                      };
+                    };
+                  };
+                  case(_){}
+                };
               };
             };
           };
@@ -196,17 +208,48 @@ actor class ExpLink() = this {
       case (?res) {Buffer.toArray(res)}
     }
   };
-  public shared func get_companies():async util.Response<[b.Biodata]> {
+  public shared func get_company_active_user({
+    principal_company_id:Text;
+  }):async [Aproval.ExperienceRequest] {
+    var res = approvalTree.get(principal_company_id);
+    switch(res){
+      case (null) { [] };
+      case (?res) {
+          res.filterEntries(func(_, x) = x.data.end_date == null and x.status == #Accepted);
+          Buffer.toArray(res)
+      };
+    }
+  };
+
+  public shared func feed(): async [u.Experience] {
+    var result:Buffer.Buffer<u.Experience> = Buffer.Buffer(5);
+    for (entry in expTree.entries()){
+      for (i in Iter.range(0, entry.1.size()-1)){
+        result.add(entry.1.get(i));
+      }
+    };
+    result.sort(func (a, b) = Nat.compare(Int.abs(b.start_date),Int.abs(a.start_date)));
+    Buffer.toArray(result);
+  };
+
+  public shared func get_user_experiences({principal_user_id:Text}): async [u.Experience] {
+    var result = expTree.get(principal_user_id);
+    switch(result) {
+      case(?result) { Buffer.toArray(result) };
+      case(null) { [] };
+    };
+  };
+
+  public shared func get_companies():async [b.Biodata] {
     var result:Buffer.Buffer<b.Biodata> = Buffer.Buffer(5);
     for (entry in tree.entries()){
       switch(entry.1.role) {
           case("Company") {
             result.add(entry.1);
           };
-          case("User"){ };
           case(_){ };
         };
       };
-    #Ok(Buffer.toArray(result));
+    Buffer.toArray(result)
   };
 };
