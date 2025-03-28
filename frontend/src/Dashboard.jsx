@@ -57,32 +57,39 @@ const Dashboard = () => {
               User Experiences
             </h3>
 
-            {userDummy.experiences.map((exp, idx) => (
-              <div
-                key={idx}
-                className="border border-white/20 rounded-lg p-4 bg-[var(--secondary)] shadow-sm space-y-1 hover:scale-[1.01] transition-all"
-              >
-                <p>
-                  <span className="font-semibold">Company:</span> {exp.company}
-                </p>
-                <p>
-                  <span className="font-semibold">Position:</span>{" "}
-                  {exp.position}
-                </p>
-                <p>
-                  <span className="font-semibold">Description:</span>{" "}
-                  {exp.description}
-                </p>
-                <p>
-                  <span className="font-semibold">Start Date:</span>{" "}
-                  {exp.start_date}
-                </p>
-                <p>
-                  <span className="font-semibold">End Date:</span>{" "}
-                  {exp.end_date ? exp.end_date : "Present"}
-                </p>
-              </div>
-            ))}
+            {userDummy.experiences.length > 0 ? (
+              userDummy.experiences.map((exp, idx) => (
+                <div
+                  key={idx}
+                  className="border border-white/20 rounded-lg p-4 bg-[var(--secondary)] shadow-sm space-y-1 hover:scale-[1.01] transition-all"
+                >
+                  <p>
+                    <span className="font-semibold">Company:</span>{" "}
+                    {exp.company}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Position:</span>{" "}
+                    {exp.position}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Description:</span>{" "}
+                    {exp.description}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Start Date:</span>{" "}
+                    {exp.start_date}
+                  </p>
+                  <p>
+                    <span className="font-semibold">End Date:</span>{" "}
+                    {exp.end_date ? exp.end_date : "Present"}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-300 italic">
+                No experiences available.
+              </p>
+            )}
           </div>
         )}
       </div>
