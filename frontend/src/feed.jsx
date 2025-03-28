@@ -17,8 +17,8 @@ const Feed = () => {
             endDate: 'Dec 2021',
             description: 'Developed and maintained user-facing features for web applications.',
             media: [
-                'https://via.placeholder.com/300', // Replace with actual image/video URLs
-                'https://via.placeholder.com/300',
+                '',
+                '',
             ],
         },
         {
@@ -28,8 +28,8 @@ const Feed = () => {
             endDate: 'Dec 2020',
             description: 'Built and optimized server-side logic and database systems.',
             media: [
-                'https://via.placeholder.com/300',
-                'https://via.placeholder.com/300',
+                '',
+                '',
             ],
         },
         {
@@ -39,8 +39,8 @@ const Feed = () => {
             endDate: 'Jan 2020',
             description: 'Designed user interfaces and improved user experience for mobile apps.',
             media: [
-                'https://via.placeholder.com/300',
-                'https://via.placeholder.com/300',
+                '',
+                '',
             ],
         },
         {
@@ -50,15 +50,15 @@ const Feed = () => {
             endDate: 'Feb 2019',
             description: 'Analyzed data and built predictive models to support business decisions.',
             media: [
-                'https://via.placeholder.com/300',
-                'https://via.placeholder.com/300',
+                '',
+                '',
             ],
         },
     ];
 
     const openCarousel = (experience) => {
         setSelectedExperience(experience);
-        setCurrentMediaIndex(0); // Reset to the first media item
+        setCurrentMediaIndex(0);
     };
 
     const closeCarousel = () => {
