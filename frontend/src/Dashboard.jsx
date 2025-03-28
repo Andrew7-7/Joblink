@@ -28,7 +28,7 @@ const userDummy = {
 };
 
 const Dashboard = () => {
-  const { user } = useContext(AuthContext);
+  const { user, experiences } = useContext(AuthContext);
 
   return (
     <div className="flex justify-center items-center absolute z-10 w-full min-h-screen p-5 bg-[var(--background)] mt-24">
