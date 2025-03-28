@@ -11,12 +11,13 @@ import Iter "mo:base/Iter";
 import Array "mo:base/Array";
 import Nat "mo:base/Nat";
 import Int "mo:base/Int";
+import Bool "mo:base/Bool";
 
 actor class ExpLink() = this {
   
   let tree = RBTree.RBTree<Text, b.Biodata>(Text.compare);
-  let expTree = RBTree.RBTree<Text, Buffer.Buffer<u.Experience>>(Text.compare);
-  let approvalTree = RBTree.RBTree<Text, Buffer.Buffer<Aproval.ExperienceRequest>>(Text.compare);
+  let expTree = RBTree.RBTree<Text, [u.Experience]>(Text.compare);
+  let approvalTree = RBTree.RBTree<Text, [Aproval.ExperienceRequest]>(Text.compare);
 
   public func generateCode():async Text{
       let random = Random.Finite(await Random.blob());
@@ -133,11 +134,12 @@ actor class ExpLink() = this {
                   case(null){
                     var list = Buffer.Buffer<Aproval.ExperienceRequest>(4);
                     list.add(new_request);
-                    approvalTree.put(principal_company_id, list);
+                    approvalTree.put(principal_company_id, Buffer.toArray(list));
                   };
                   case(?approvals){
-                    approvals.add(new_request);
-                    approvalTree.put(principal_company_id, approvals);
+                    var list = Buffer.fromArray<Aproval.ExperienceRequest>(approvals);
+                    list.add(new_request);
+                    approvalTree.put(principal_company_id, Buffer.toArray(list));
                   }
                 }
           };
@@ -170,20 +172,22 @@ actor class ExpLink() = this {
                   data = res.get(index).data;
                   status = status;
                 };
-                res.put(index, updated);
-                approvalTree.put(principal_company_id, res);
+                var list = Buffer.fromArray<Aproval.ExperienceRequest>(res);
+                list.put(index, updated);
+                approvalTree.put(principal_company_id, Buffer.toArray(list));
                 switch(status) {
                   case(#Accepted) { 
                     var exp = expTree.get(res.get(index).data.principal_user_id);
                     switch(exp) {
                       case(?exp) { 
-                            exp.add(res.get(index).data);
-                            expTree.put(res.get(index).data.principal_user_id, exp);
+                            var list = Buffer.fromArray<u.Experience>(exp);
+                            list.add(res.get(index).data);
+                            expTree.put(res.get(index).data.principal_user_id, Buffer.toArray(list));
                        };
                       case(null) { 
                             var list = Buffer.Buffer<u.Experience>(5);
                             list.add(res.get(index).data);
-                            expTree.put(res.get(index).data.principal_user_id, list);
+                            expTree.put(res.get(index).data.principal_user_id, Buffer.toArray(list));
                       };
                     };
                   };
@@ -205,18 +209,18 @@ actor class ExpLink() = this {
     var res = approvalTree.get(principal_company_id);
     switch(res){
       case (null) { [] };
-      case (?res) {Buffer.toArray(res)}
+      case (?res) { res }
     }
   };
-  public shared func get_company_active_user({
+  public shared func get_company_user({
     principal_company_id:Text;
+    is_active:Bool
   }):async [Aproval.ExperienceRequest] {
     var res = approvalTree.get(principal_company_id);
     switch(res){
       case (null) { [] };
       case (?res) {
-          res.filterEntries(func(_, x) = x.data.end_date == null and x.status == #Accepted);
-          Buffer.toArray(res)
+          Array.filter<Aproval.ExperienceRequest>(res, func x = (x.data.end_date == null) == is_active and x.status == #Accepted);
       };
     }
   };
@@ -235,7 +239,7 @@ actor class ExpLink() = this {
   public shared func get_user_experiences({principal_user_id:Text}): async [u.Experience] {
     var result = expTree.get(principal_user_id);
     switch(result) {
-      case(?result) { Buffer.toArray(result) };
+      case(?result) { result };
       case(null) { [] };
     };
   };
