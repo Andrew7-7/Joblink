@@ -1,18 +1,17 @@
-import { useContext } from "react"
-import {AuthContext} from "./AuthContext"
-import React from 'react';
-import Register from './Register';
-import Dashboard from './Dashboard';
+import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
+import React from "react";
+import Register from "./Register";
+import Dashboard from "./Dashboard";
 
 const Home = () => {
+  const { user } = useContext(AuthContext);
 
-    const {user} = useContext(AuthContext)
+  return (
+    <>
+      {(user == "")?<Register />:<Dashboard />}
+    </>
+  );
+};
 
-    return (
-        <>
-            {(user == "")?<Register />:<Dashboard />}
-        </>
-    )
-}
-
-export default Home
+export default Home;
