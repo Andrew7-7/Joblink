@@ -4,7 +4,7 @@ import Popup from "./Popup"
 import Button from "./Button"
 import { backend } from 'declarations/backend';
 
-const AddExperience = () => {
+const AddExperience = ({setIndex}) => {
 
   const [message, setmessage] = useState('')
   const [status, setStatus] = useState('')
@@ -85,6 +85,9 @@ const AddExperience = () => {
     if (result == ""){
       setmessage("Experience Request Added")
       setStatus("success")
+      setTimeout(() => {
+        setIndex(0)
+      }, 3000)
     }else{
       setmessage(result)
       setStatus("failed")
@@ -105,7 +108,7 @@ const AddExperience = () => {
                     <div className="relative">
                         <select onChange={(e) => setCompany(e.target.value)}
                             className="w-full bg-transparent placeholder:text-slate-700 text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-8 py-1.5 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer">
-                            {companies.map(e => <option value={e.principal_id}>{e.principal_id}</option>)}
+                            {companies.map(e => <option value={e.principal_id}>{e.name}</option>)}
                         </select>
                       </div>
                     <label htmlFor="name" className="text-white font-bold transition-all peer-placeholder-shown:text-gray-400 peer-placeholder-shown:translate-y-8 peer-focus:translate-y-0 peer-focus:text-blue-400">

@@ -12,8 +12,6 @@ import Bool "mo:base/Bool";
 
 actor class ExpLink() = this {
 
-  
-
   public type Experience = {
         principal_user_id:Text;
         position: Text;
@@ -24,7 +22,6 @@ actor class ExpLink() = this {
 
   public type Status = {
         #Rejected;
-        #Canceled;
         #Pending;
         #Accepted;
     };
@@ -37,6 +34,69 @@ actor class ExpLink() = this {
   let tree = RBTree.RBTree<Text, b.Biodata>(Text.compare);
   let expTree = RBTree.RBTree<Text, [Experience]>(Text.compare);
   let approvalTree = RBTree.RBTree<Text, [ExperienceRequest]>(Text.compare);
+
+  public shared func seed(): async b.Response<Null>{
+    var users:[Text] = ["Andrew","Charles Darwin","Anthony","Freddy","Alex Kurniawawn"];
+    var companies:[Text] = ["Google","Twitter","IBM","Meta","Microsoft", "OpenAI", "Nvidia", "Netflix"];
+    var exps:Buffer.Buffer<Text> = Buffer.fromArray<Text>(["Frontend Developer", "Backend Engineer", "AI Engineer", "Cloud Solution Technician", "Data Analyst", "DevOps Engineer", "Project Manager"]);
+    var desc:Buffer.Buffer<Text> = Buffer.fromArray<Text>([
+      "Designs, builds, and optimizes user-friendly web interfaces.",
+      "Develops, maintains, and optimizes server-side application logic.",
+      "Builds, trains, and deploys machine learning models efficiently.",
+      "Implements, manages, and secures cloud-based infrastructure solutions.",
+      "Collects, processes, and interprets data for actionable insights.",
+      "Automates, integrates, and manages CI/CD and cloud infrastructure.",
+      "Plans, coordinates, and executes projects within defined constraints."
+    ]);
+    var num:Nat = 1; 
+    for (name in users.vals()){
+      tree.put(Nat.toText(num),{
+        name=name;
+        email=Text.replace(Text.toLowercase(name),#char ' ', ".") # "@gmail.com";
+        profile_pic="/User.png";
+        principal_id=Nat.toText(num);
+        role = "User";
+      });
+      let random = Random.Finite(await Random.blob());
+      var list = Buffer.Buffer<Experience>(5);
+      var list_app = Buffer.Buffer<ExperienceRequest>(5);
+      var number = random.range(32);
+        switch(number){
+          case (null){};
+          case (?rand){
+            var number = rand % exps.size();
+            var exp = {
+              position=exps.get(number);
+              principal_user_id=Nat.toText(num + 5);
+              description=desc.get(number);
+              start_date=Time.now() /1000000;
+              end_date=null;
+            };
+            var approval = {
+              data=exp;
+              status=#Accepted;
+            };
+            list_app.add(approval);            
+            list.add(exp);
+            expTree.put(Nat.toText(num), Buffer.toArray(list));
+            approvalTree.put(Nat.toText(num + 5),Buffer.toArray(list_app));
+          };
+        };
+    
+      num += 1;
+    };
+    for (name in companies.vals()){
+      tree.put(Nat.toText(num),{
+        name=name;
+        email=Text.replace(Text.toLowercase(name),#char ' ', ".") # "@email.com";
+        profile_pic="/Company.png";
+        principal_id=Nat.toText(num);
+        role = "Company";
+      });
+      num += 1;
+    };
+    #Ok(null);
+  };
 
   public func generateCode():async Text{
       let random = Random.Finite(await Random.blob());
@@ -200,12 +260,26 @@ actor class ExpLink() = this {
                     switch(exp) {
                       case(?exp) { 
                             var list = Buffer.fromArray<Experience>(exp);
-                            list.add(res.get(index).data);
+                            var new_exp = res.get(index).data;
+                            list.add({
+                              principal_user_id=principal_company_id;
+                              position=new_exp.position;
+                              start_date=new_exp.start_date;
+                              end_date=new_exp.end_date;
+                              description=new_exp.description;
+                            });
                             expTree.put(res.get(index).data.principal_user_id, Buffer.toArray(list));
                        };
                       case(null) { 
                             var list = Buffer.Buffer<Experience>(5);
-                            list.add(res.get(index).data);
+                            var new_exp = res.get(index).data;
+                            list.add({
+                              principal_user_id=principal_company_id;
+                              position=new_exp.position;
+                              start_date=new_exp.start_date;
+                              end_date=new_exp.end_date;
+                              description=new_exp.description;
+                            });
                             expTree.put(res.get(index).data.principal_user_id, Buffer.toArray(list));
                       };
                     };
@@ -244,13 +318,15 @@ actor class ExpLink() = this {
     }
   };
 
-  public shared func feed(): async [Experience] {
+  public shared func feed({principal_user_id:Text}): async [Experience] {
     var result:Buffer.Buffer<Experience> = Buffer.Buffer(5);
     for (entry in expTree.entries()){
-      for (i in Iter.range(0, entry.1.size()-1)){
-        result.add(entry.1.get(i));
+      var list = Buffer.fromArray<Experience>(entry.1);
+      for (i in Iter.range(0, list.size()-1)){
+        result.add(list.get(i));
       }
     };
+    result.filterEntries(func(_,x) = x.principal_user_id != principal_user_id);
     result.sort(func (a, b) = Nat.compare(Int.abs(b.start_date),Int.abs(a.start_date)));
     Buffer.toArray(result);
   };

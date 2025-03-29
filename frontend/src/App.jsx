@@ -1,18 +1,38 @@
 import React, { useContext, useState } from 'react';
 import Landing from './Landing';
 import {AuthContext} from './AuthContext';
-import Home from './Home';
 import Header from './Header';
-
+import Register from './Register';
+import Dashboard from './Dashboard';
+import Feed from './Feed';
+import Approval from './Approval';
+import Company from './Company';
+import AddExperience from './AddExperience';
 
 const App = () => {
-  const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext)
+  const [index, setIndex] = useState(0)
+  const pages = {
+    "User":["Home","Feed","Company"],
+    "Company":["Home","Feed","Aproval"]
+  }
+  const components = {
+    "User":[
+      <Dashboard setIndex={setIndex}/>, 
+      <Feed />, 
+      <Company />, 
+      <AddExperience setIndex={setIndex}/>],
+    "Company":[
+      <Dashboard setIndex={setIndex}/>, 
+      <Feed />, 
+      <Approval />],
+  }
+  const {user,isAuthenticated, setIsAuthenticated} = useContext(AuthContext)
   return (
     <>
-      <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated}/>
-            <div className="min-h-screen w-full bg-gradient-to-b from-[var(--background)] to-[var(--secondary)] overflow-hidden">
+      <Header pages={pages} index={index} setIndex={setIndex} isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated}/>
+            <div className="min-h-screen w-full bg-gradient-to-b from-[var(--background)] to-[var(--secondary)] overflow-x-hidden relative">
                 {isAuthenticated? (
-                  <Home />
+                  <>{(user == "")?<Register />:components[user.role][index]}</>
                 ):(
                   <Landing />
                 )}

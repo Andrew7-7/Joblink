@@ -23,8 +23,8 @@ module {
         if (username.size() < 1){
             return #Err("username cant be empty!");
         };
-        if (Text.endsWith(email,#text "@gmail.com") == false){
-            return #Err("email must ends with @gmail.com!");
+        if (Text.endsWith(email,#text ".com") == false or Text.contains(email, #text "@") == false){
+            return #Err("email must contains @ and ends with .com!");
         };
         if (profile_pic.size() < 1){
             return #Err("you must have a profile picture");
