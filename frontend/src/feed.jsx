@@ -1,17 +1,21 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { backend } from 'declarations/backend';
-import { AuthContext } from './AuthContext';
 
 
 const Feed = () => {
+    const [selectedExperience, setSelectedExperience] = useState(null);
+   
+    const openCarousel = (experience) => {
+        setSelectedExperience(experience);
+        setCurrentMediaIndex(0);
+    };
 
-    const {principal} = useContext(AuthContext)
     const [experiences, setExperiences] = useState([])
 
   const getExperiences = async () => {
     try{
-      const res = await backend.feed({principal_user_id:principal})
+      const res = await backend.feed({principal_user_id:"0"})
       setExperiences(res)
     }catch(e){
         setExperiences([{

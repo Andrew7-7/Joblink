@@ -32,11 +32,10 @@ const AuthProvider = ({ children }) => {
     setActor(actor);
     setAuthClient(authClient);
     setIsAuthenticated(isAuthenticated);
-    setPrincipal(identity.getPrincipal().toString());
+    setPrincipal( identity.getPrincipal().toString())
     if (isAuthenticated) {
       try {
         let loginUser = await backend.get_user({
-          // principal_id: '1',
           principal_id: identity.getPrincipal().toString(),
         });
         const userData = loginUser[0] ?? "";

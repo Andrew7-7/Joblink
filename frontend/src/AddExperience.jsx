@@ -103,7 +103,7 @@ const AddExperience = ({setIndex}) => {
     <Popup type={"failed"} status={status} message={message}/>
     <Popup type={'success'} status={status} message={message}/>
     <div className="flex flex-col gap-y-3 h-4/5 items-center justify-center w-2/5 bg-[var(--secondary)] rounded-xl absolute z-10 left-[50%] top-[50%] translate-y-[-50%] translate-x-[-50%] p-10 backdrop-opacity-0 drop-shadow-lg">
-          <p className="w-4/5 text-red-300 text-md">* shows question that must be filled {company}</p>
+          <p className="w-4/5 text-red-300 text-md">* shows question that must be filled</p>
               <div className="w-4/5 h-1/6 flex flex-col-reverse gap-1">
                     <div className="relative">
                         <select onChange={(e) => setCompany(e.target.value)}

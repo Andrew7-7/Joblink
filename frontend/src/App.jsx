@@ -13,7 +13,7 @@ const App = () => {
   const [index, setIndex] = useState(0)
   const pages = {
     "User":["Home","Feed","Company"],
-    "Company":["Home","Feed","Aproval"]
+    "Company":["Home","Feed","Approval"]
   }
   const components = {
     "User":[

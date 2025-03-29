@@ -154,34 +154,6 @@ actor class ExpLink() = this {
     user
   };
 
-  public shared func update_profile({
-    principal_id: Text;
-    username: Text;
-    email: Text;
-    profile_pic: Text;
-    
-  }):async b.Response<Null> {
-    let result = b.validate_biodata({username; email; profile_pic}); 
-    switch(result) {
-      case(#Err(error)){
-        return #Err(error);
-      };
-      case(#Ok(_)){
-        var result:?b.Biodata = tree.get(principal_id);
-        switch(result) {
-          case(null) { return #Err("Not found!") };
-          case(?result) {
-            tree.put(principal_id,{
-                name=username;email=email;profile_pic=profile_pic;principal_id=principal_id;role=result.role;
-            });
-            #Ok(null);
-          };
-        };
-      };
-    };
-    
-  };
-
   public shared func create_experience({
     principal_user_id: Text;
     principal_company_id: Text;
@@ -303,18 +275,6 @@ actor class ExpLink() = this {
     switch(res){
       case (null) { [] };
       case (?res) { res }
-    }
-  };
-  public shared func get_company_user({
-    principal_company_id:Text;
-    is_active:Bool
-  }):async [ExperienceRequest] {
-    var res = approvalTree.get(principal_company_id);
-    switch(res){
-      case (null) { [] };
-      case (?res) {
-          Array.filter<ExperienceRequest>(res, func x = (x.data.end_date == null) == is_active and x.status == #Accepted);
-      };
     }
   };
 
