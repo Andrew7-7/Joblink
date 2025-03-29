@@ -4,13 +4,11 @@
 
 *This project was developed using the ICP Ninja IDE.*
 
----
-
 ## Application Description
 
-JobLink is a cutting-edge web3 application designed to bridge the gap between job seekers and enterprises. By leveraging blockchain technology, JobLink makes every candidate’s profile and work experience both verifiable and immutable. This groundbreaking approach instills a high level of credibility and trust for all users, establishing JobLink as a reliable reference in the recruitment market.
+JobLink is a web3 application that aims to link job seekers with enterprises, essentially closing the gap between them. What sets this platform apart is its use of blockchain technology, which ensures that every candidate's profile and experience is verifiable and immutable. This gives a greater degree of credibility to both job seekers and enterprises, making JobLink a trusted reference in the market.
 
----
+The application offers two distinct points of view:
 
 - **Job Seeker Perspective:**
   - **Home Page:** Displays the user's profile where they can add or update personal details and work experience.  
