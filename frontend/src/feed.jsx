@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import { backend } from 'declarations/backend';
+import { AuthContext } from './AuthContext';
 
 
 const Feed = () => {
 
+    const {principal} = useContext(AuthContext)
     const [experiences, setExperiences] = useState([])
 
   const getExperiences = async () => {
     try{
-      const res = await backend.feed({principal_user_id:"0"})
+      const res = await backend.feed({principal_user_id:principal})
       setExperiences(res)
     }catch(e){
         setExperiences([{
