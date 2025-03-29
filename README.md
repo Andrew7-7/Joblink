@@ -24,6 +24,10 @@ The application offers two distinct points of view:
   - **Approval Page:** Contains a dedicated section for reviewing and approving candidate experiences that have been submitted for association with the company.  
     ![WhatsApp Image 2025-03-29 at 20 02 35_d674f978](https://github.com/user-attachments/assets/0e3e2009-923b-4596-be37-350bac151135)
 
+## Security Features
+
+JobLink uses Internet Identity for verification, offering users increased security and privacy. In addition, the app has a strong randomness mechanism to generate verification codes, which further strengthens its security. This commitment to using advanced web3 technologies guarantees that the verification process as well as the platform itself is highly secure and reliable.
+
 ## Project structure
 
 The `/backend` folder contains the Motoko canister, `app.mo`. The `/frontend` folder contains web assets for the application's user interface. The user interface is written using the React framework. Edit the `mops.toml` file to add [Motoko dependencies](https://mops.one/) to the project.
