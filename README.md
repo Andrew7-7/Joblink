@@ -1,26 +1,32 @@
-# Tokenmania!
+# JobLink!
 
-![Tokenmania](https://icp.ninja/examples/_attachments/tokenmania.jpg)
+![WhatsApp Image 2025-03-29 at 20 02 34_451e46b2](https://github.com/user-attachments/assets/9535f73b-1c61-4bf7-a727-64a9fe9a12d0)
 
-Tokenmania is a simplified token minting application. When the application is ran, you will be prompted to sign in with Internet Identity. Once signed in, select the 'Mint' function. It will mint tokens based on the backend smart contract's hardcoded configuration values for things such as token name, token symbol, and total supply. The owner principal of the token will be your Internet Identity principal.
+*This project was developed using the ICP Ninja IDE.*
 
-> [!CAUTION]
-> This example is for demonstration purposes. It does not reflect a best practices workflow for creating and minting tokens on ICP.
-> Actual production tokens deployed on ICP use a dedicated ledger smart contract and an index smart contract. For this example's demonstration, this functionality has been simplified and the ledger functionality is included in the backend smart contract.
-> Tokens deployed using this example are only available for 20 minutes and will be deleted afterwards. They should be treated as "testnet" assets and should not be given real value.
-> For more information on creating tokens using a recommended production workflow, view the [create a token documentation](https://internetcomputer.org/docs/current/developer-docs/defi/tokens/create).
+## Application Description
 
-This example application is written in [Motoko](https://internetcomputer.org/docs/motoko/main/getting-started/motoko-introduction), a programming language designed specifically for developing canisters on ICP.
+JobLink is a web3 application that aims to link job seekers with enterprises, essentially closing the gap between them. What sets this platform apart is its use of blockchain technology, which ensures that every candidate's profile and experience is verifiable and immutable. This gives a greater degree of credibility to both job seekers and enterprises, making JobLink a trusted reference in the market.
 
-## What is ICP Ninja?
+The application offers two distinct points of view:
 
-ICP Ninja is a web-based integrated development environment (IDE) for the Internet Computer. It allows you to write code and deploy applications directly from your web browser in a temporary, sandbox-like environment.
+- **Job Seeker Perspective:**
+  - **Home Page:** Displays the user's profile where they can add or update personal details and work experience.  
+    ![WhatsApp Image 2025-03-29 at 20 02 33_7aa1e6d0](https://github.com/user-attachments/assets/caf4df49-9dd0-4fc0-8bb0-73a754e717dc)
+  - **Feed Page:** Showcases a timeline of the user's experiences, acting as a dynamic record of their career growth.  
+    ![WhatsApp Image 2025-03-29 at 20 02 33_97b08c17](https://github.com/user-attachments/assets/11442b11-ca33-4a50-919b-d1fee1dc6427)
+  - **Company Page:** Focuses on the company's history and profile.  
+    ![WhatsApp Image 2025-03-29 at 20 02 33_436f9ccf](https://github.com/user-attachments/assets/784bda16-7351-4512-aebf-af5aaca2856b)
+  
+- **Company Perspective:**
+  - **Home Page:** Displays the company's profile, providing an overview of the company's information.
+    ![WhatsApp Image 2025-03-29 at 20 02 34_79d93efc](https://github.com/user-attachments/assets/82d74936-fd59-4420-b37b-6526d2422504)
+  - **Approval Page:** Contains a dedicated section for reviewing and approving candidate experiences that have been submitted for association with the company.  
+    ![WhatsApp Image 2025-03-29 at 20 02 35_d674f978](https://github.com/user-attachments/assets/0e3e2009-923b-4596-be37-350bac151135)
 
-For users who may already be familiar with the Internet Computer or who would rather use more **advanced tooling** such as command-line development tools, please refer to the [ICP developer documentation](https://internetcomputer.org/docs/building-apps/getting-started/install) to learn more.
+## Security Features
 
-Projects deployed to ICP from ICP Ninja are available on the mainnet for 20 minutes at a time. After 20 minutes, the project must be redeployed.
-
-To deploy your project for long-term, production use such that it persists longer than 20 minutes without needing to be redeployed, you must migrate the files off of ICP Ninja and deploy them to the mainnet via `dfx` in a command-line environment.
+JobLink uses Internet Identity for verification, offering users increased security and privacy. In addition, the app has a strong randomness mechanism to generate verification codes, which further strengthens its security. This commitment to using advanced web3 technologies guarantees that the verification process as well as the platform itself is highly secure and reliable.
 
 ## Project structure
 
@@ -31,17 +37,3 @@ The `/backend` folder contains the Motoko canister, `app.mo`. The `/frontend` fo
 When viewing this project in ICP Ninja, you can deploy it directly to the mainnet for free by clicking "Deploy" in the upper right corner.
 
 To **download** or **reset** the project files, click the menu option next to the deploy button.
-
-## Editing files
-
-To make adjustments to this project, you can edit any file that is unlocked. Then, redeploy your application to view your changes.
-
-To edit files that are immutable in ICP Ninja, you can export the project to GitHub or download the project to your local environment using the "Download files" option.
-
-## Build and deploy from the command-line
-
-To migrate your ICP Ninja project off of the web browser and develop it locally, follow these steps. These steps are necessary if you want to deploy this project for long-term, production use on the mainnet.
-
-### 1. Download your project from ICP Ninja using the 'Download files' button on the upper left corner under the pink ninja star icon.
-
-### 2. Open the `BUILD.md` file for further instructions.
