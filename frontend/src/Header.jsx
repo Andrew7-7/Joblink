@@ -4,10 +4,8 @@ import {AuthContext} from "./AuthContext";
 
 const Header = ({ index, setIndex, pages, isAuthenticated, setIsAuthenticated }) => {
 
-  const {setActor} = useContext(AuthContext)
-  const user = {
-    role:"User"
-  }
+  const {user,setActor} = useContext(AuthContext)
+  
   
   return (
     pages[user.role].length > index && <header className="mb-2 p-8 w-full text-white fixed top w-screen flex flex-row flex-wrap items-center justify-between z-50">

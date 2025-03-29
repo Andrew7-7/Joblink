@@ -4,12 +4,6 @@ import { backend } from 'declarations/backend';
 
 
 const Feed = () => {
-    const [selectedExperience, setSelectedExperience] = useState(null);
-   
-    const openCarousel = (experience) => {
-        setSelectedExperience(experience);
-        setCurrentMediaIndex(0);
-    };
 
     const [experiences, setExperiences] = useState([])
 
