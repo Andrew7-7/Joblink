@@ -36,8 +36,8 @@ const AuthProvider = ({ children }) => {
     if (isAuthenticated) {
       try {
         let loginUser = await backend.get_user({
-          principal_id: '1',
-          // principal_id: identity.getPrincipal().toString(),
+          // principal_id: '1',
+          principal_id: identity.getPrincipal().toString(),
         });
         const userData = loginUser[0] ?? "";
         setUser(userData);
